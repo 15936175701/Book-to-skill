@@ -2,7 +2,7 @@
 
 `clean_pdftotext` treats the first/last non-blank line of each page as a
 boilerplate candidate and drops every edge occurrence of any string repeated on
-more than half the pages. #161's fix confined that to page edges so a *mid-page*
+more than half the pages. #113 confined that to page edges so a *mid-page*
 heading identical to the running header survives.
 
 But a chapter opening is not mid-page: books start a chapter at the top of a

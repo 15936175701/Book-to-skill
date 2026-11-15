@@ -53,6 +53,30 @@ class TestChapterOpeningAtPageTop:
         assert "Prose page 3 of chapter one." in out
         assert "\n3\n" not in out
 
+    def test_non_ascii_chapter_numeral_is_also_rescued(self):
+        """The number signal must not be ASCII-only: this extractor supports
+        Devanagari, Bengali, Tamil and other numerals."""
+        raw = "\f".join(
+            [f"अध्याय १\nपाठ {i}." for i in range(1, 5)] + ["अध्याय २\nपाठ."]
+        )
+        out = clean_pdftotext(raw)
+
+        assert out.count("अध्याय १") == 1
+        assert detect_structure(out)["chapters_detected"] == 2
+
+    def test_numbered_non_chapter_header_leaves_one_copy(self):
+        """Documents the known ceiling of using "carries a number" as the signal.
+
+        A numbered running header is not a chapter opening, but it cannot be told
+        apart from one without the extractor's own chapter detection, which
+        cannot be imported here without an import cycle. One copy survives
+        instead of none; the rest are still removed.
+        """
+        raw = "\f".join([f"Section 3.2\nBody {i}." for i in range(1, 4)])
+        out = clean_pdftotext(raw)
+
+        assert out.count("Section 3.2") == 1
+
     def test_non_heading_running_header_is_still_fully_removed(self):
         """A running header that is not a chapter heading keeps its old handling."""
         raw = "\f".join([
